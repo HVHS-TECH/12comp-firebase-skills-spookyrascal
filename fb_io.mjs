@@ -19,7 +19,7 @@ import { getDatabase }
     from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
-    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; // ✅ Single import for all auth methods
+    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 import { getAnalytics } 
     from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
@@ -41,7 +41,7 @@ const FB_GAMECONFIG = {
 const FB_GAMEAPP = initializeApp(FB_GAMECONFIG);
 const FB_GAMEDB = getDatabase(FB_GAMEAPP);
 const analytics = getAnalytics(FB_GAMEAPP);
-const AUTH = getAuth(FB_GAMEAPP); // ✅ Only declare AUTH once
+const AUTH = getAuth(FB_GAMEAPP);
 
 console.info(FB_GAMEDB);
 
@@ -91,6 +91,23 @@ function fb_logout() {
       alert(`Logout failed: ${error.message}`);
     });
 }
+
+/**************************************************************/
+// Detect login state change
+/**************************************************************/
+onAuthStateChanged(AUTH, (user) => {
+  if (user) {
+    console.log('%c ✅ User is logged in', 'color: green;');
+    console.log('User Info:', {
+      name: user.displayName,
+      email: user.email,
+      uid: user.uid,
+      photo: user.photoURL
+    });
+  } else {
+    console.log('%c ❌ No user is logged in', 'color: red;');
+  }
+});
 
 /**************************************************************/
 // EXPORT FUNCTIONS
