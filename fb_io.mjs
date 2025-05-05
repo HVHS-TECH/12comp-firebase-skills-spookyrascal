@@ -13,21 +13,16 @@ console.log('%c fb_io.mjs', 'color: blue; background-color: white;');
 // Import all external constants & functions required
 /**************************************************************/
 import { initializeApp } 
-  from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
 import { getDatabase } 
-  from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; // ✅ Single import for all auth methods
 
 import { getAnalytics } 
-  from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; 
-// ✅ Used same version for ALL firebase modules
+    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
 /**************************************************************/
 // Firebase Config & App Init
@@ -46,7 +41,7 @@ const FB_GAMECONFIG = {
 const FB_GAMEAPP = initializeApp(FB_GAMECONFIG);
 const FB_GAMEDB = getDatabase(FB_GAMEAPP);
 const analytics = getAnalytics(FB_GAMEAPP);
-const AUTH = getAuth(FB_GAMEAPP);
+const AUTH = getAuth(FB_GAMEAPP); // ✅ Only declare AUTH once
 
 console.info(FB_GAMEDB);
 
@@ -81,19 +76,21 @@ signInWithPopup(AUTH, PROVIDER)
     alert(`Sign-in failed: ${error.message}`);
   });
 
-/**************************************************************/
-// Auth State Listener
-/**************************************************************/
-onAuthStateChanged(AUTH, (user) => {
-  if (user) {
-    console.log('%c ✅ User is logged in', 'color: green;');
-  } else {
-    console.log('%c 🚪 User is logged out', 'color: orange;');
-  }
-}, (error) => {
-  console.error('%c ❌ Auth state error', 'color: red;');
-  console.error(error);
-});
+//**************************************************************/
+// Logout 
+//**************************************************************/
+function fb_logout() {
+  signOut(AUTH)
+    .then(() => {
+      console.log('%c ✅ User is logged out', 'color: green;');
+      alert('You have been logged out.');
+    })
+    .catch((error) => {
+      console.log('%c ❌ Logout failed', 'color: orange;');
+      console.error(error);
+      alert(`Logout failed: ${error.message}`);
+    });
+}
 
 /**************************************************************/
 // EXPORT FUNCTIONS
