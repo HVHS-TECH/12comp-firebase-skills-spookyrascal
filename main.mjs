@@ -4,8 +4,8 @@
 // Written by Carmen O'Grady, Term 2 2025
 //
 /**************************************************************/
-const COL_C = 'white';	    // These two const are part of the coloured 	
-const COL_B = '#CD7F32';	//  console.log for functions scheme
+const COL_C = 'white';	    	
+const COL_B = '#CD7F32';
 console.log('%c main.mjs', 
     'color: blue; background-color: white;');
 
@@ -14,15 +14,12 @@ console.log('%c main.mjs',
 /**************************************************************/
 // Import all the constants & functions required from fb_io module
 
-import { fb_initialise }
-    from './fb_io.mjs';
-    window.fb_initialise   = fb_initialise;
-
-
- 
-/**************************************************************/
-// index.html main code
-/**************************************************************/
+import { fb_initialise, fb_authenticate, fb_login, fb_logout, fb_write } from './fb_io.mjs';
+window.fb_initialise = fb_initialise;
+window.fb_authenticate = fb_authenticate;
+window.fb_login = fb_login;
+window.fb_logout = fb_logout;
+window.fb_write = fb_write;
 
 
 /**************************************************************/

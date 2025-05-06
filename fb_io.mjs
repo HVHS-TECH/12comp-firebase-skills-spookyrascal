@@ -4,25 +4,18 @@
 // Written by Carmen O'Grady, Term 2 2025
 /**************************************************************/
 
-const COL_C = 'white';      // These two const are part of the coloured 	
-const COL_B = '#CD7F32';    //  console.log for functions scheme
+const COL_C = 'white';      
+const COL_B = '#CD7F32';    
 
 console.log('%c fb_io.mjs', 'color: blue; background-color: white;');
 
 /**************************************************************/
 // Import all external constants & functions required
 /**************************************************************/
-import { initializeApp } 
-    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-
-import { getDatabase } 
-    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
-    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-import { getAnalytics } 
-    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
 /**************************************************************/
 // Firebase Config & App Init
@@ -54,31 +47,33 @@ PROVIDER.setCustomParameters({
   prompt: 'select_account'
 });
 
-signInWithPopup(AUTH, PROVIDER)
-  .then((result) => {
-    const user = result.user;
+function fb_authenticate() {
+  signInWithPopup(AUTH, PROVIDER)
+    .then((result) => {
+      const user = result.user;
 
-    console.log('%c ✅ User signed in successfully!', 'color: green;');
-    console.log('User Info:', {
-      name: user.displayName,
-      email: user.email,
-      uid: user.uid,
-      photo: user.photoURL
+      console.log('%c ✅ User signed in successfully!', 'color: green;');
+      console.log('User Info:', {
+        name: user.displayName,
+        email: user.email,
+        uid: user.uid,
+        photo: user.photoURL
+      });
+
+      alert(`Welcome, ${user.displayName || "User"}!`);
+    })
+    .catch((error) => {
+      console.error('%c ❌ Sign-in failed!', 'color: red;');
+      console.error('Error Code:', error.code);
+      console.error('Message:', error.message);
+
+      alert(`Sign-in failed: ${error.message}`);
     });
+}
 
-    alert(`Welcome, ${user.displayName || "User"}!`);
-  })
-  .catch((error) => {
-    console.error('%c ❌ Sign-in failed!', 'color: red;');
-    console.error('Error Code:', error.code);
-    console.error('Message:', error.message);
-
-    alert(`Sign-in failed: ${error.message}`);
-  });
-
-//**************************************************************/
+/**************************************************************/
 // Logout 
-//**************************************************************/
+/**************************************************************/
 function fb_logout() {
   signOut(AUTH)
     .then(() => {
@@ -95,32 +90,59 @@ function fb_logout() {
 /**************************************************************/
 // Detect login state change
 /**************************************************************/
-onAuthStateChanged(AUTH, (user) => {
-  if (user) {
-    console.log('%c ✅ User is logged in', 'color: green;');
-    console.log('User Info:', {
-      name: user.displayName,
-      email: user.email,
-      uid: user.uid,
-      photo: user.photoURL
-    });
-  } else {
-    console.log('%c ❌ No user is logged in', 'color: red;');
-  }
-});
+function fb_login() {
+  onAuthStateChanged(AUTH, (user) => {
+    if (user) {
+      console.log('%c ✅ User is logged in', 'color: green;');
+      console.log('User Info:', {
+        name: user.displayName,
+        email: user.email,
+        uid: user.uid,
+        photo: user.photoURL
+      });
+    } else {
+      console.log('%c ❌ No user is logged in', 'color: red;');
+    }
+  });
+}
 
 /**************************************************************/
-// EXPORT FUNCTIONS
+// Write a record to Firebase
+/**************************************************************/
+function fb_write(path, data) {
+  const dbRef = ref(FB_GAMEDB, path); // where to write in the DB
+
+  set(dbRef, data)
+    .then(() => {
+      console.log('%c ✅ Data written successfully!', 'color: green;');
+      alert('Data saved!');
+    })
+    .catch((error) => {
+      console.error('%c ❌ Failed to write data', 'color: red;');
+      console.error(error);
+      alert(`Error: ${error.message}`);
+    });
+}
+
+/**************************************************************/
+// Initialise Firebase Log Message
 /**************************************************************/
 function fb_initialise() {
   console.log('%c fb_initialise(): ', 
               'color: ' + COL_C + '; background-color: ' + COL_B + ';');
 }
 
+/**************************************************************/
+// EXPORT FUNCTIONS
+/**************************************************************/
 export { 
-  fb_initialise, 
-  FB_GAMEAPP, 
-  FB_GAMECONFIG 
+  fb_initialise,       // Logs that Firebase has been initialised
+  fb_authenticate,     // Signs user in with Google popup
+  fb_logout,           // Signs user out
+  fb_login,            // Detects login state changes
+  fb_write,            // Writes data to the realtime database
+  FB_GAMEAPP,          // The initialized Firebase app
+  FB_GAMECONFIG        // The config object, in case needed elsewhere
 };
 
 /**************************************************************/
