@@ -16,6 +16,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+import { ref, get} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
 
 /**************************************************************/
 // Firebase Config & App Init
@@ -123,6 +125,38 @@ function fb_write(path, data) {
       alert(`Error: ${error.message}`);
     });
 }
+/**************************************************************/
+// Read a record from Firebase
+/**************************************************************/
+function fb_read(path, statusElement) {
+  const dbRef = ref(FB_GAMEDB, path); // where to read in the DB
+
+  get(dbRef).then((snapshot) => {
+    const fb_data = snapshot.val();
+
+    if (fb_data != null) {
+      console.log('%c ✅ Data read successfully!', 'color: green;');
+      console.log('Data:', fb_data);
+
+      if (statusElement) {
+        statusElement.innerText = `🎉 Data: ${JSON.stringify(fb_data)}`;
+      }
+    } else {
+      console.log('%c ⚠️ No data found at that path.', 'color: orange;');
+
+      if (statusElement) {
+        statusElement.innerText = "⚠️ No record found in Firebase.";
+      }
+    }
+  }).catch((error) => {
+    console.error('%c ❌ Error reading data from Firebase', 'color: red;');
+    console.error(error);
+
+    if (statusElement) {
+      statusElement.innerText = `❌ Error: ${error.message}`;
+    }
+  });
+}
 
 /**************************************************************/
 // Initialise Firebase Log Message
@@ -141,6 +175,7 @@ export {
   fb_logout,           // Signs user out
   fb_login,            // Detects login state changes
   fb_write,            // Writes data to the realtime database
+  fb_read,
   FB_GAMEAPP,          // The initialized Firebase app
   FB_GAMECONFIG        // The config object, in case needed elsewhere
 };
