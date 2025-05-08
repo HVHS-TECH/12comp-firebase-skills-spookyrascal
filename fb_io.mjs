@@ -12,12 +12,11 @@ console.log('%c fb_io.mjs', 'color: blue; background-color: white;');
 /**************************************************************/
 // Import all external constants & functions required
 /**************************************************************/
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-import { ref, get} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
 /**************************************************************/
 // Firebase Config & App Init
@@ -112,7 +111,7 @@ function fb_login() {
 // Write a record to Firebase
 /**************************************************************/
 function fb_write(path, data) {
-  const dbRef = ref(FB_GAMEDB, path); // where to write in the DB
+  const dbRef = ref(FB_GAMEDB, path);
 
   set(dbRef, data)
     .then(() => {
@@ -125,37 +124,67 @@ function fb_write(path, data) {
       alert(`Error: ${error.message}`);
     });
 }
+
 /**************************************************************/
 // Read a record from Firebase
 /**************************************************************/
 function fb_read(path, statusElement) {
-  const dbRef = ref(FB_GAMEDB, path); // where to read in the DB
+  const dbRef = ref(FB_GAMEDB, path);
 
-  get(dbRef).then((snapshot) => {
-    const fb_data = snapshot.val();
+  get(dbRef)
+    .then((snapshot) => {
+      const fb_data = snapshot.val();
 
-    if (fb_data != null) {
-      console.log('%c ✅ Data read successfully!', 'color: green;');
-      console.log('Data:', fb_data);
+      if (fb_data != null) {
+        console.log('%c ✅ Data read successfully!', 'color: green;');
+        console.log('Data:', fb_data);
+
+        if (statusElement) {
+          statusElement.innerText = `🎉 Data: ${JSON.stringify(fb_data, null, 2)}`;
+        }
+      } else {
+        console.log('%c ⚠️ No data found at that path.', 'color: orange;');
+
+        if (statusElement) {
+          statusElement.innerText = "⚠️ No record found in Firebase.";
+        }
+      }
+    })
+    .catch((error) => {
+      console.error('%c ❌ Error reading data from Firebase', 'color: red;');
+      console.error(error);
 
       if (statusElement) {
-        statusElement.innerText = `🎉 Data: ${JSON.stringify(fb_data)}`;
+        statusElement.innerText = `❌ Error: ${error.message}`;
       }
-    } else {
-      console.log('%c ⚠️ No data found at that path.', 'color: orange;');
+    });
+}
 
-      if (statusElement) {
-        statusElement.innerText = "⚠️ No record found in Firebase.";
+/**************************************************************/
+// Read all records from a path in Firebase
+/**************************************************************/
+function fb_readall() {
+  const whereToReadFrom = "Book Series"; // You can change this path
+  const reference = ref(FB_GAMEDB, whereToReadFrom);
+
+  get(reference)
+    .then((snapshot) => {
+      const fb_data = snapshot.val();
+
+      if (fb_data != null) {
+        document.getElementById("p_fbReadAll").innerHTML = "✅ Success: " + JSON.stringify(fb_data, null, 2);
+        console.log('%c ✅ All data read successfully!', 'color: green;');
+        console.log(fb_data);
+      } else {
+        document.getElementById("p_fbReadAll").innerHTML = "⚠️ No records found";
+        console.log('%c ⚠️ No data found at that path.', 'color: orange;');
       }
-    }
-  }).catch((error) => {
-    console.error('%c ❌ Error reading data from Firebase', 'color: red;');
-    console.error(error);
-
-    if (statusElement) {
-      statusElement.innerText = `❌ Error: ${error.message}`;
-    }
-  });
+    })
+    .catch((error) => {
+      document.getElementById("p_fbReadAll").innerHTML = "❌ Error: " + error.message;
+      console.error('%c ❌ Error reading all data from Firebase', 'color: red;');
+      console.error(error);
+    });
 }
 
 /**************************************************************/
@@ -170,14 +199,15 @@ function fb_initialise() {
 // EXPORT FUNCTIONS
 /**************************************************************/
 export { 
-  fb_initialise,       // Logs that Firebase has been initialised
-  fb_authenticate,     // Signs user in with Google popup
-  fb_logout,           // Signs user out
-  fb_login,            // Detects login state changes
-  fb_write,            // Writes data to the realtime database
+  fb_initialise,   
+  fb_authenticate,    
+  fb_logout,           
+  fb_login,            
+  fb_write,            
   fb_read,
-  FB_GAMEAPP,          // The initialized Firebase app
-  FB_GAMECONFIG        // The config object, in case needed elsewhere
+  fb_readall,
+  FB_GAMEAPP,          
+  FB_GAMECONFIG       
 };
 
 /**************************************************************/
