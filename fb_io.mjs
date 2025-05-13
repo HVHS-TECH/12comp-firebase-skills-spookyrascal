@@ -1,6 +1,5 @@
 //**************************************************************/
 // fb_io.mjs
-// Generalised firebase routines
 // Written by Carmen O'Grady, Term 2 2025
 /**************************************************************/
 
@@ -15,8 +14,9 @@ console.log('%c fb_io.mjs', 'color: blue; background-color: white;');
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { ref, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
 /**************************************************************/
 // Firebase Config & App Init
@@ -98,8 +98,6 @@ function fb_login() {
       console.log('User Info:', {
         name: user.displayName,
         email: user.email,
-        uid: user.uid,
-        photo: user.photoURL
       });
     } else {
       console.log('%c ❌ No user is logged in', 'color: red;');
@@ -164,7 +162,7 @@ function fb_read(path, statusElement) {
 // Read all records from a path in Firebase
 /**************************************************************/
 function fb_readall() {
-  const whereToReadFrom = "Book Series"; // You can change this path
+  const whereToReadFrom = "Book Series"; 
   const reference = ref(FB_GAMEDB, whereToReadFrom);
 
   get(reference)
@@ -188,6 +186,23 @@ function fb_readall() {
 }
 
 /**************************************************************/
+// update a firebase record
+/**************************************************************/
+function fb_update() { 
+const dbReference= ref(FB_GAMEDB, "Book Series");
+
+    update(dbReference, fb_data).then(() => {
+
+        ✅ Code for a successful update goes here
+
+    }).catch((error) => {
+
+        ❌ Code for a update error goes here
+
+    });
+
+  }
+/**************************************************************/
 // Initialise Firebase Log Message
 /**************************************************************/
 function fb_initialise() {
@@ -206,6 +221,7 @@ export {
   fb_write,            
   fb_read,
   fb_readall,
+  fb_update,
   FB_GAMEAPP,          
   FB_GAMECONFIG       
 };
